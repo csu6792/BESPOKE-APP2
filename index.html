@@ -191,8 +191,8 @@
     <!-- 頂部導覽 -->
     <div class="header">
         <div class="header-logo">
-            <span class="brand">Bespoke</span>
-            <span class="sub-brand">PRO LIGHTBOX SYSTEM</span>
+            <span class="brand">Bespoke 2</span>
+            <span class="sub-brand">LIGHTBOX SYSTEM</span>
         </div>
         <span id="status" style="display: none;">STANDBY</span>
         <div id="statusIcon" class="status-icon danger" title="未連線 (STANDBY)">
@@ -248,13 +248,13 @@
             <div class="card">
                 <div class="card-header">
                     <div>
-                        <h3 class="card-title">光感及情境</h3>
+                        <h3 class="card-title">光感&情境</h3>
                         <div class="card-title-eng">Color, ECO & Timer</div>
                     </div>
                 </div>
                 <div class="slider-container">
                     <div class="slider-label-group">
-                        <span class="slider-label">發光亮度</span>
+                        <span class="slider-label">亮度</span>
                         <span class="slider-value" id="brightnessVal">85%</span>
                     </div>
                     <input type="range" id="brightnessInput" class="custom-range" min="0" max="100" value="85" oninput="updateBrightness(this.value)" onchange="vibrateLight()">
@@ -262,7 +262,7 @@
                 <div style="margin-top: 32px;">
                     <button id="ecoBtn" class="btn btn-eco" style="width: 100%;" onclick="toggleEcoMode()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-                        <span>智慧節能 (鎖定 30%)</span>
+                        <span>ECO 智慧節能 (鎖定 30%)</span>
                     </button>
                 </div>
                 <div style="margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.04);">
@@ -287,12 +287,12 @@
                         <input type="color" id="rgbInput" value="#FFEAD2" onchange="vibrate(); applyCustomColor(this.value)">
                     </div>
                     <div class="preset-colors">
-                        <div class="preset-dot active" style="--dot-color: #FFEAD2; background: var(--dot-color);" title="首爾落日暖橘" onclick="applyPreset('#FFEAD2', this)"></div>
+                        <div class="preset-dot active" style="--dot-color: #FFEAD2; background: var(--dot-color);" title="落日暖橘" onclick="applyPreset('#FFEAD2', this)"></div>
                         <div class="preset-dot" style="--dot-color: #FFFDFC; background: var(--dot-color);" title="極簡石膏冷白" onclick="applyPreset('#FFFDFC', this)"></div>
                         <div class="preset-dot" style="--dot-color: #EBE1D7; background: var(--dot-color);" title="高雅燕麥杏白" onclick="applyPreset('#EBE1D7', this)"></div>
-                        <div class="preset-dot" style="--dot-color: #FFD3B6; background: var(--dot-color);" title="江南霓虹暖粉" onclick="applyPreset('#FFD3B6', this)"></div>
-                        <div class="preset-dot" style="--dot-color: #A8E6CF; background: var(--dot-color);" title="濟州薄荷清綠" onclick="applyPreset('#A8E6CF', this)"></div>
-                        <div class="preset-dot" style="--dot-color: #DCE5E7; background: var(--dot-color);" title="漢江清晨天藍" onclick="applyPreset('#DCE5E7', this)"></div>
+                        <div class="preset-dot" style="--dot-color: #FFD3B6; background: var(--dot-color);" title="霓虹暖粉" onclick="applyPreset('#FFD3B6', this)"></div>
+                        <div class="preset-dot" style="--dot-color: #A8E6CF; background: var(--dot-color);" title="薄荷清綠" onclick="applyPreset('#A8E6CF', this)"></div>
+                        <div class="preset-dot" style="--dot-color: #DCE5E7; background: var(--dot-color);" title="清晨天藍" onclick="applyPreset('#DCE5E7', this)"></div>
                     </div>
                 </div>
             </div>
@@ -365,10 +365,10 @@
             <div class="card" style="min-height: 65vh;">
                 <div class="card-header" style="margin-bottom: 40px;">
                     <div>
-                        <h3 class="card-title">風景藝術畫廊</h3>
+                        <h3 class="card-title">ART.藝術畫廊</h3>
                         <div class="card-title-eng">Scenic Artistry Gallery</div>
                         <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 12px; line-height: 1.5; font-weight: 300;">
-                            點擊探索 Hue 風格的多重漸變混光技術，為您的空間注入世界級的絕美光景。
+                            點擊探索多重漸變混光技術，為您的空間注入世界級的絕美光景。
                         </p>
                     </div>
                 </div>
@@ -414,7 +414,7 @@
         </div>
         <div class="nav-item" id="tab-gallery" onclick="switchTab('gallery')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>品牌畫廊</span>
+            <span>藝術畫廊</span>
         </div>
     </div>
 
