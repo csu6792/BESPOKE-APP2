@@ -760,24 +760,28 @@
             }
         }
 
-		// 🌐 GitHub Pages (HTTPS) 專屬：BLE-Link 一鍵喚醒與自動帶入網址
+		// 🌐 GitHub Pages 專屬：精準喚醒 BLE-Link 瀏覽器
 function handleIOSRedirect() {
     try { 
         if (typeof vibrate === "function") vibrate(); 
     } catch(e) {}
     
     try { 
-        if (typeof showToast === "function") showToast('正在喚醒 BLE-Link 藍牙控制器...'); 
+        if (typeof showToast === "function") showToast('正在喚醒 BLE-Link...'); 
     } catch(e) {}
 
-    // 1. 取得當前的 GitHub Pages 完整網址 (包含 https://)
+    // 1. 取得當前的 GitHub Pages 完整網址
     const currentURL = window.location.href;
     
-    // 2. 針對 BLE-Link 的標準 URL Scheme 格式
-    // 格式為 blelink://https://xxxx.github.io/
-    const blelinkScheme = "blelink://" + currentURL;
+    // 2. 【關鍵修正】去除網址前綴的 http:// 或 https://
+    // 例如：https://csuilab.github.io/燈箱網頁/ -> csuilab.github.io/燈箱網頁/
+    const cleanURL = currentURL.replace(/^https?:\/\//, '');
+    
+    // 3. 組合成 BLE-Link 的精確通訊協定格式
+    // 格式必須是：ble-link://xxxx.github.io/
+    const bleLinkScheme = "ble-link://" + cleanURL;
 
-    // 3. 【黃金防呆】背景自動複製網址（萬一系統阻擋，用戶直接長按貼上）
+    // 4. 【雙重防線】背景自動複製網址（萬一 App 進去是空白，長按貼上即可）
     try {
         navigator.clipboard.writeText(currentURL);
     } catch(err) {
@@ -789,35 +793,32 @@ function handleIOSRedirect() {
         document.body.removeChild(el);
     }
 
-    // 4. 更新提示文字
+    // 5. 畫面下方動態滑出優雅提示與手動下載傳送門
     const fallbackEl = document.getElementById('ios-fallback');
     if (fallbackEl) {
-        fallbackEl.innerHTML = `<span onclick="copyCurrentURL()" style="font-size: 0.6rem; color: #96938D; cursor: pointer; text-decoration: underline; letter-spacing: 0.05em;">
-            💡 網址已自動複製。若 App 未成功載入，請在網址列「長按貼上」。
-        </span>`;
+        fallbackEl.innerHTML = `
+            <div style="margin-top: 15px; padding: 16px; background: rgba(194, 167, 130, 0.08); border: 1px solid rgba(194, 167, 130, 0.3); border-radius: 12px; text-align: left; animation: fadeIn 0.3s;">
+                <p style="font-size: 0.65rem; color: var(--text-primary); margin-bottom: 6px; font-weight: 600;">➔ 已為您自動複製控制網址！</p>
+                <ol style="font-size: 0.6rem; color: var(--text-secondary); margin: 0 0 12px 14px; padding: 0; line-height: 1.6;">
+                    <li>若手機跳出「在 BLE-Link 開啟」提示，請點選<b style="color:var(--accent-gold)">開啟</b>。</li>
+                    <li>若進入 App 後未自動載入，請在網址列<b style="color:var(--accent-gold)">長按並點選「貼上並前往」</b>。</li>
+                </ol>
+                <div style="display: flex; gap: 8px;">
+                    <a href="${bleLinkScheme}" style="flex: 1; text-align: center; font-size: 0.6rem; color: white; background: var(--accent-gold, #C2A782); text-decoration: none; padding: 6px 0; border-radius: 6px; letter-spacing: 0.05em; font-weight: 500;">重新呼叫 App</a>
+                    <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" style="flex: 1; text-align: center; font-size: 0.6rem; color: #96938D; border: 1px solid #96938D; text-decoration: none; padding: 5px 0; border-radius: 6px;">下載 BLE-Link</a>
+                </div>
+            </div>
+        `;
         fallbackEl.style.display = 'block';
     }
 
-    // 5. 模擬真人點擊，喚醒 BLE-Link 並帶入 HTTPS 網址
+    // 6. 模擬真人點擊，精準喚醒 BLE-Link
     const a = document.createElement('a');
-    a.href = blelinkScheme;
+    a.href = bleLinkScheme;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 100);
-
-    const startTime = Date.now();
-
-    // 6. 延遲 3 秒：若沒安裝，精準導向台灣區 BLE-Link 下載頁
-    setTimeout(function() {
-        if (Date.now() - startTime < 3500) {
-            try { 
-                if (typeof showToast === "function") showToast('未偵測到 App，導向 App Store...'); 
-            } catch(e) {}
-            // 使用您提供的正確 ID
-            window.location.href = "itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672";
-        }
-    }, 3000);
+    setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 500);
 }
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
