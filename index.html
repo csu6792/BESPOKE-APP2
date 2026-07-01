@@ -24,7 +24,7 @@
         }
 
         @keyframes slideUpFadeIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(25px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -61,26 +61,29 @@
             to { box-shadow: 0 4px 20px rgba(209, 177, 123, 0.4); }
         }
 
-        /* 主容器與分頁 */
         .container { padding: 24px; max-width: 900px; margin: auto; box-sizing: border-box; padding-bottom: 110px; }
         .view-section { display: none; grid-template-columns: 1fr; gap: 28px; }
-        .view-section.active { display: grid; animation: slideUpFadeIn 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .view-section.active { display: grid; }
 
+        /* 卡片本體預設隱藏，由 JS 動態加上帶延遲的動畫類別 */
         .card { 
             background: var(--bg-card); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border-radius: 36px; padding: 36px; border: 1px solid var(--border-highlight); 
             box-shadow: 0 20px 50px rgba(160, 155, 145, 0.08); transition: var(--transition-smooth);
+            opacity: 0;
         }
         .card:hover { box-shadow: 0 25px 60px rgba(194, 167, 130, 0.12); }
-        .view-section .card:nth-child(1) { animation-delay: 0.1s; }
-        .view-section .card:nth-child(2) { animation-delay: 0.15s; }
-        .view-section .card:nth-child(3) { animation-delay: 0.2s; }
+        
+        /* 💡 動態重置與階梯式延遲動畫 */
+        .card.animate-card { animation: slideUpFadeIn 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .card.animate-card:nth-child(1) { animation-delay: 0.05s; }
+        .card.animate-card:nth-child(2) { animation-delay: 0.15s; }
+        .card.animate-card:nth-child(3) { animation-delay: 0.25s; }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
         .card-title { font-size: 1.05rem; color: var(--text-primary); margin: 0; font-weight: 600; letter-spacing: 0.1em; }
         .card-title-eng { font-size: 0.6rem; color: var(--text-secondary); font-weight: 300; text-transform: uppercase; letter-spacing: 0.25em; margin-top: 6px; }
 
-        /* 擬真燈箱 */
         .lightbox-simulator {
             background: #1C1B1A; border-radius: 24px; padding: 45px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 50px rgba(0,0,0,0.6); margin-bottom: 12px;
         }
@@ -90,7 +93,6 @@
         .acrylic-sign h4 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 200; letter-spacing: 0.3em; color: #1A1A1A; }
         .acrylic-sign p { margin: 6px 0 0; font-size: 0.6rem; font-weight: 300; letter-spacing: 0.2em; color: var(--text-secondary); text-transform: uppercase; }
 
-        /* 底部導覽列 */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: rgba(250, 249, 245, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             display: flex; justify-content: space-around; padding: 16px 0 28px 0; border-top: 1px solid rgba(255,255,255,0.8); z-index: 100; box-shadow: 0 -10px 30px rgba(0,0,0,0.03);
@@ -101,7 +103,6 @@
         .nav-item.active svg { filter: drop-shadow(0 4px 8px rgba(194, 167, 130, 0.4)); }
         .nav-item span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; }
 
-        /* 按鈕 */
         .btn { border: none; border-radius: 50px; padding: 16px 24px; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--text-primary); color: #FFF; box-shadow: 0 10px 25px rgba(44, 43, 41, 0.2); }
@@ -111,7 +112,6 @@
         .btn-eco { background: rgba(152, 168, 154, 0.1); color: var(--accent-eco); }
         .btn-eco.active { background: var(--accent-eco); color: #FFF; box-shadow: 0 8px 25px rgba(152, 168, 154, 0.4); }
 
-        /* 畫廊卡片 */
         .scene-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px; }
         @media (max-width: 600px) { .scene-grid { grid-template-columns: 1fr; } }
         .scene-card {
@@ -133,7 +133,6 @@
         .scene-title { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.05em; }
         .scene-sub { font-size: 0.65rem; font-weight: 300; color: var(--text-secondary); letter-spacing: 0.1em; text-transform: uppercase; }
 
-        /* Modal 面板 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
             z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s ease;
@@ -151,7 +150,6 @@
         .modal-title-area h2 { margin: 0; font-size: 1.2rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.1em; }
         .modal-title-area p { margin: 4px 0 0; font-size: 0.75rem; font-weight: 300; color: var(--text-secondary); letter-spacing: 0.15em; text-transform: uppercase; }
 
-        /* 特效卡片 */
         .effects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px; }
         .effect-card { background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.8); border-radius: 24px; padding: 20px 16px; cursor: pointer; transition: var(--transition-smooth); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .effect-card:hover { background: rgba(255,255,255,0.8); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
@@ -159,7 +157,6 @@
         .effect-name { font-size: 0.8rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.1em;}
         .effect-desc { font-size: 0.65rem; font-weight: 300; color: var(--text-secondary); line-height: 1.4; }
 
-        /* 滑桿 */
         .slider-container { display: flex; flex-direction: column; gap: 18px; margin-top: 24px; }
         .slider-label-group { display: flex; justify-content: space-between; align-items: center; }
         .slider-label { font-size: 0.8rem; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 10px; letter-spacing: 0.1em;}
@@ -167,7 +164,6 @@
         .custom-range { -webkit-appearance: none; width: 100%; height: 14px; border-radius: 20px; background: rgba(0,0,0,0.04); outline: none; overflow: hidden; cursor: pointer; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
         .custom-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #FFF; box-shadow: -4007px 0 0 4000px var(--accent-gold), 0 0 5px rgba(0,0,0,0.1); }
 
-        /* 色盤 */
         .color-control-wrapper { display: flex; gap: 16px; align-items: center; margin-top: 16px; }
         .color-picker-round { position: relative; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; border: 2px solid #FFF; box-shadow: 0 4px 15px rgba(0,0,0,0.06); cursor: pointer; flex-shrink: 0; }
         input[type="color"] { position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer; }
@@ -175,7 +171,6 @@
         .preset-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; transition: var(--transition-smooth); position: relative; }
         .preset-dot.active { box-shadow: 0 0 0 3px var(--bg-card), 0 0 0 4px var(--dot-color); transform: scale(1.1); }
 
-        /* Toast 通知 */
         .toast-container {
             position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: rgba(44, 43, 41, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -184,14 +179,31 @@
             transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s; z-index: 2000; opacity: 0; pointer-events: none;
         }
         .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* 🌟 設定分頁專屬優雅樣式 */
+        .story-p {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            font-weight: 300;
+            text-align: justify;
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+        .story-divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(194, 167, 130, 0) 0%, rgba(194, 167, 130, 0.4) 50%, rgba(194, 167, 130, 0) 100%);
+            margin: 36px 0;
+            border: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 頂部導覽 -->
+    <!-- 頂部高質感導覽 -->
     <div class="header">
         <div class="header-logo">
-            <span class="brand">Bespoke 2</span>
+            <span class="brand">Bespoke</span>
             <span class="sub-brand">LIGHTBOX SYSTEM</span>
         </div>
         <span id="status" style="display: none;">STANDBY</span>
@@ -225,7 +237,7 @@
                     </div>
                     <div class="acrylic-sign" id="acrylicSign">
                         <h4>COE</h4>
-                        <p>6792@gcloud.csu.edu.tw</p>
+                        <p>Aesthetic</p>
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: center; margin-top: 24px;">
@@ -241,7 +253,6 @@
                 </div>
                 <div style="font-size: 0.65rem; color: var(--text-secondary); padding-top: 16px; margin-top: 16px; display: flex; justify-content: space-between; letter-spacing: 0.1em; border-top: 1px solid rgba(0,0,0,0.02);">
                     <span>設備：<span id="info" style="font-family: 'Montserrat', monospace; color: var(--text-primary);">--</span></span>
-                    
                 </div>
             </div>
 
@@ -287,6 +298,7 @@
                         <input type="color" id="rgbInput" value="#FFEAD2" onchange="vibrate(); applyCustomColor(this.value)">
                     </div>
                     <div class="preset-colors">
+                        <!-- 補齊色系 title 屬性，利於 Toast 顯示名稱 -->
                         <div class="preset-dot active" style="--dot-color: #FFEAD2; background: var(--dot-color);" title="落日暖橘" onclick="applyPreset('#FFEAD2', this)"></div>
                         <div class="preset-dot" style="--dot-color: #FFFDFC; background: var(--dot-color);" title="極簡石膏冷白" onclick="applyPreset('#FFFDFC', this)"></div>
                         <div class="preset-dot" style="--dot-color: #EBE1D7; background: var(--dot-color);" title="高雅燕麥杏白" onclick="applyPreset('#EBE1D7', this)"></div>
@@ -401,9 +413,156 @@
                             <span class="scene-sub">Spring Sakura</span>
                         </div>
                     </div>
+					
+					<div class="scene-card" id="scene-custom" onclick="triggerCustomUpload()">
+                        <div class="scene-palette-preview" id="custom-palette-preview" style="background: rgba(194, 167, 130, 0.1); display: flex; align-items: center; justify-content: center; border: 1px dashed var(--accent-gold);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                        <div class="scene-text">
+                            <span class="scene-title">專屬客製光景</span>
+                            <span class="scene-sub">Upload & Extract</span>
+                        </div>
+                    </div>
+                    <!-- 隱藏的檔案選擇器 -->
+                    <input type="file" id="customImageInput" accept="image/*" style="display: none;" onchange="handleCustomImageUpload(event)">
                 </div>
             </div>
         </div>
+
+        <!-- 🎯 頁面三：設定頁面 (Settings) -->
+        <div id="view-settings" class="view-section">
+            <div class="card">
+                <div class="card-header" style="margin-bottom: 24px;">
+                    <div>
+                        <h3 class="card-title">品牌故事與研發</h3>
+                        <div class="card-title-eng">Brand Story & CSU iLab</div>
+                    </div>
+                </div>
+                
+                <!-- 品牌故事敘述 -->
+                <div style="padding-top: 8px;">
+                    <p class="story-p">
+                        <strong>BESPOKE 智慧燈箱</strong> 將「光線」視為空間溫度的裁縫師。我們深信，光芒不只是單純的照明功能，更是營造情緒、烘托氛圍的空間靈魂。我們致力於打破傳統家電生硬的工程感，將智慧操控轉化為日常儀式中優雅而靜謐的陪伴。
+                    </p>
+                    <p class="story-p">
+                        本套系統由 <strong>CSU iLab（正修科技大學 創客基地）</strong> 協同開發，專注於物聯網應用。實驗室以創新科技為經、頂級美學為緯，為智慧生活空間賦予永恆的藝術價值。
+                    </p>
+                </div>
+
+                <hr class="story-divider">
+
+                <!-- 🌟 替換為正修創客基地 CSU iLab 專屬 SVG 標誌 -->
+                <div style="display: flex; justify-content: center; align-items: center; padding: 24px 0;">
+                    <svg viewBox="0 0 800 650" style="width: 100%; max-width: 400px; height: auto; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.06));" xmlns="http://www.w3.org/2000/svg">
+                      
+                      <!-- ================= 第一層：全域粗白邊外框 ================= -->
+                      <!-- 利用加粗的白色描邊，將所有元素的輪廓融合成一個統一的外框 -->
+                      <g fill="#FFFFFF" stroke="#FFFFFF" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">
+                          
+                          <!-- 1. i 的底座 (適當大小的「A」左半部) -->
+                          <polygon points="270,190 350,190 350,430 310,430 290,340 270,430 200,430" />
+
+                          <!-- 2. CSU (C從底部開始，整串字旋轉近90度躺平，如同書脊般平行貼合於左側斜邊) -->
+                          <g transform="translate(235, 310) rotate(-74)">
+                              <text x="0" y="20" text-anchor="middle" font-family="'Arial Black', Impact, sans-serif" font-size="68" font-weight="bold" letter-spacing="6">CSU</text>
+                          </g>
+
+                          <!-- 3. Lab (具動態向右傾斜斜體) -->
+                          <g transform="translate(320, 430) skewX(-12)" font-family="'Arial Black', Impact, sans-serif" font-size="240" font-weight="bold">
+                              <text x="0" y="0">L</text>
+                              <text x="135" y="0">a</text>
+                              <text x="270" y="0">b</text>
+                          </g>
+
+                          <!-- 4. 頂端手套外框 (5指白色手套輪廓) -->
+                          <g transform="translate(310, 120) rotate(-5) scale(0.9)">
+                              <g transform="translate(-48, -45)" stroke="#FFFFFF" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="#FFFFFF">
+                                  <line x1="30" y1="52" x2="6" y2="35" />
+                                  <line x1="38" y1="45" x2="32" y2="12" />
+                                  <line x1="54" y1="42" x2="54" y2="5" />
+                                  <line x1="70" y1="45" x2="76" y2="12" />
+                                  <line x1="84" y1="52" x2="92" y2="30" />
+                                  <polygon points="26,50 38,45 54,42 70,45 84,52 82,75 22,75" />
+                                  <rect x="18" y="73" width="70" height="22" rx="3" />
+                              </g>
+                          </g>
+
+                          <!-- 5. 底部中文外框 -->
+                          <text x="400" y="550" text-anchor="middle" font-family="'Microsoft JhengHei', 'PingFang TC', sans-serif" font-size="85" font-weight="900">正修創客基地</text>
+                      </g>
+
+
+                      <!-- ================= 第二層：彩色本體與細部描邊 ================= -->
+                      <g>
+                          <!-- 1. i 的底座 (A形白底) -->
+                          <polygon points="270,190 350,190 350,430 310,430 290,340 270,430 200,430" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="2" />
+
+                          <!-- 2. CSU (旋轉躺平，開口方向與原圖完全一致) -->
+                          <g transform="translate(235, 310) rotate(-74)">
+                              <text x="0" y="20" text-anchor="middle" fill="#FFFFFF" stroke="#999999" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill" font-family="'Arial Black', Impact, sans-serif" font-size="68" font-weight="bold" letter-spacing="6">CSU</text>
+                          </g>
+
+                          <!-- 3. Lab -->
+                          <g transform="translate(320, 430) skewX(-12)" font-family="'Arial Black', Impact, sans-serif" font-size="240" font-weight="bold" stroke-linejoin="round" paint-order="stroke fill">
+                              <!-- L 為綠色，無內框疊在 A 上 -->
+                              <text x="0" y="0" fill="#61A631" stroke="none">L</text>
+                              <!-- a 為藍色，帶有白框，疊加在 L 上 -->
+                              <text x="135" y="0" fill="#1D99C9" stroke="#FFFFFF" stroke-width="10">a</text>
+                              <!-- b 為黃色，帶有白框，疊加在 a 上 -->
+                              <text x="270" y="0" fill="#E8C913" stroke="#FFFFFF" stroke-width="10">b</text>
+                          </g>
+
+                          <!-- 4. 頂端手套 (還原為簡潔的5指白色手套) -->
+                          <g transform="translate(310, 120) rotate(-5) scale(0.9)">
+                              <g transform="translate(-48, -45)">
+                                  <!-- 灰色外輪廓底層 -->
+                                  <g stroke="#999999" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="#999999">
+                                      <line x1="30" y1="52" x2="6" y2="35" />
+                                      <line x1="38" y1="45" x2="32" y2="12" />
+                                      <line x1="54" y1="42" x2="54" y2="5" />
+                                      <line x1="70" y1="45" x2="76" y2="12" />
+                                      <line x1="84" y1="52" x2="92" y2="30" />
+                                      <polygon points="26,50 38,45 54,42 70,45 84,52 82,75 22,75" />
+                                  </g>
+
+                                  <!-- 白色手套本體 -->
+                                  <g stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="#FFFFFF">
+                                      <line x1="30" y1="52" x2="6" y2="35" />
+                                      <line x1="38" y1="45" x2="32" y2="12" />
+                                      <line x1="54" y1="42" x2="54" y2="5" />
+                                      <line x1="70" y1="45" x2="76" y2="12" />
+                                      <line x1="84" y1="52" x2="92" y2="30" />
+                                      <polygon points="26,50 38,45 54,42 70,45 84,52 82,75 22,75" />
+                                  </g>
+
+                                  <!-- 簡單的橘色護腕 -->
+                                  <rect x="18" y="73" width="70" height="22" rx="3" fill="#DE6A10" stroke="#999999" stroke-width="4" />
+                                  
+                                  <!-- 護腕上的白色縫線 (保留一點點細節使其不單調) -->
+                                  <g stroke="#FFFFFF" stroke-width="2">
+                                      <line x1="25" y1="75" x2="25" y2="93" />
+                                      <line x1="35" y1="75" x2="35" y2="93" />
+                                      <line x1="45" y1="75" x2="45" y2="93" />
+                                      <line x1="55" y1="75" x2="55" y2="93" />
+                                      <line x1="65" y1="75" x2="65" y2="93" />
+                                      <line x1="75" y1="75" x2="75" y2="93" />
+                                  </g>
+                              </g>
+                          </g>
+
+                          <!-- 5. 底部中文 -->
+                          <text x="400" y="550" text-anchor="middle" fill="#FFFFFF" stroke="#DE6A10" stroke-width="14" stroke-linejoin="round" paint-order="stroke fill" font-family="'Microsoft JhengHei', 'PingFang TC', sans-serif" font-size="85" font-weight="900">正修創客基地</text>
+                      </g>
+                    </svg>
+                </div>
+                
+                <div style="text-align: center; font-size: 0.65rem; color: var(--text-secondary); margin-top: 16px; font-family: 'Montserrat', sans-serif; letter-spacing: 0.15em;">
+                    © 2026 BESPOKE & CSU iLab. All Rights Reserved.
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <!-- 底部導覽列 -->
@@ -415,6 +574,13 @@
         <div class="nav-item" id="tab-gallery" onclick="switchTab('gallery')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span>藝術畫廊</span>
+        </div>
+        <div class="nav-item" id="tab-settings" onclick="switchTab('settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>設定</span>
         </div>
     </div>
 
@@ -448,11 +614,11 @@
         </div>
     </div>
 
-    <!-- 網頁應用核心邏輯 (已將 BLE 整合封裝，不再依賴外部 app.js) -->
+    <!-- 網頁應用核心邏輯 -->
     <script>
-        // ===================================================
-        // 🌟 基礎安全輔助函式
-        // ===================================================
+        // =========================================================================
+        // 🌟 基礎安全輔助函式 (最優先聲明，防止 Hoisting 失敗造成 ReferenceError)
+        // =========================================================================
         function hexToRgba(hex, alpha) {
             if (!hex || typeof hex !== 'string') return `rgba(255, 255, 255, ${alpha})`;
             const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
@@ -467,32 +633,9 @@
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
         }
 
-        // =======================
-        // 自癒式動態 Toast 通知機制
-        // =======================
-        function showToast(message) {
-            let toast = document.getElementById("toast");
-            let toastMsg = document.getElementById("toastMsg");
-            
-            if (!toast || !toastMsg) {
-                if (toast) toast.remove(); 
-                toast = document.createElement("div"); toast.id = "toast"; toast.className = "toast-container";
-                toastMsg = document.createElement("span"); toastMsg.id = "toastMsg";
-                toast.appendChild(toastMsg); document.body.appendChild(toast);
-            }
-            
-            toastMsg.innerText = message;
-            toast.classList.add("show");
-            if (toast.timeoutId) clearTimeout(toast.timeoutId);
-            toast.timeoutId = setTimeout(() => { toast.classList.remove("show"); }, 3000);
-        }
-
-        function vibrate() { if (navigator.vibrate) navigator.vibrate(15); }
-        function vibrateLight() { if (navigator.vibrate) navigator.vibrate([5]); }
-
-        // =======================
-        // BLE 藍牙連線核心
-        // =======================
+        // =========================================================================
+        // 🌟 藍牙 BLE 控制核心變數與函數 (直接整合自原 app.js，確保 sendCmd 與 sendRGB 可完美存取)
+        // =========================================================================
         const SERVICE = "12345678-1234-1234-1234-000000000001";
         const INFO    = "12345678-1234-1234-1234-000000000010";
         const DATA    = "12345678-1234-1234-1234-000000000020";
@@ -515,16 +658,22 @@
 
                 bleDevice.addEventListener("gattserverdisconnected", () => {
                     document.getElementById("status").innerText = "狀態：斷線";
-                    commandChar = null; dataChar = null;
+                    commandChar = null; 
+                    dataChar = null;
                     showToast("連線已中斷");
                 });
 
                 let service = await bleServer.getPrimaryService(SERVICE);
+                
+                // 讀取設備資訊
                 let infoChar = await service.getCharacteristic(INFO);
                 let infoValue = await infoChar.readValue();
                 let infoEl = document.getElementById("info");
-                if (infoEl) infoEl.innerText = new TextDecoder().decode(infoValue);
+                if (infoEl) {
+                    infoEl.innerText = new TextDecoder().decode(infoValue);
+                }
 
+                // 取得指令特徵值
                 commandChar = await service.getCharacteristic(COMMAND);
                 document.getElementById("status").innerText = "狀態：已就緒";
             } catch(e) {
@@ -540,22 +689,32 @@
             } else {
                 document.getElementById("status").innerText = "STANDBY";
             }
-            commandChar = null; dataChar = null; bleServer = null;
+            commandChar = null; 
+            dataChar = null; 
+            bleServer = null;
         }
 
         async function sendCmd(cmdStr) {
-            if (!commandChar) { console.warn("未連線實體燈箱"); return; }
+            if (!commandChar) { 
+                console.warn("未連線實體燈箱，略過實體 BLE 指令發送"); 
+                return; 
+            }
             try {
                 await commandChar.writeValue(new TextEncoder().encode(cmdStr));
-            } catch(e) { console.error("指令發送失敗:", e); }
+                console.log("BLE 指令發送成功:", cmdStr);
+            } catch(e) { 
+                console.error("BLE 指令發送失敗:", e); 
+            }
         }
 
         async function sendRGB() {
             let colorInput = document.getElementById("rgbInput");
-            if (colorInput) await sendCmd("RGB:" + colorInput.value);
+            if (colorInput) {
+                await sendCmd("RGB:" + colorInput.value);
+            }
         }
-
-        function triggerConnect() {
+		
+		function triggerConnect() {
             vibrate();
             if (typeof navigator.bluetooth !== 'undefined' && typeof connect === 'function') { 
                 connect(); 
@@ -576,9 +735,27 @@
             }
         }
 
-        // =======================
-        // 核心系統變數與場景資料
-        // =======================
+        // =========================================================================
+        // 🌟 自癒式動態 Toast 通知機制
+        // =========================================================================
+        function showToast(message) {
+            let toast = document.getElementById("toast");
+            let toastMsg = document.getElementById("toastMsg");
+            if (!toast || !toastMsg) {
+                if (toast) toast.remove(); 
+                toast = document.createElement("div"); toast.id = "toast"; toast.className = "toast-container";
+                toastMsg = document.createElement("span"); toastMsg.id = "toastMsg";
+                toast.appendChild(toastMsg); document.body.appendChild(toast);
+            }
+            toastMsg.innerText = message;
+            toast.classList.add("show");
+            if (toast.timeoutId) clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => { toast.classList.remove("show"); }, 3000);
+        }
+
+        function vibrate() { if (navigator.vibrate) navigator.vibrate(15); }
+        function vibrateLight() { if (navigator.vibrate) navigator.vibrate([5]); }
+
         let currentMode = 'static'; 
         let currentHex = '#FFEAD2';
         let brightness = 85;
@@ -591,24 +768,35 @@
         let flowIndex = 0;
         let rainbowHue = 0;
 
-        // 🌟 100% 穩定且正確的維基百科開源相片：首爾盤浦大橋月光彩虹噴泉夜景
         const sceneData = {
             'jeju': { title: '濟州落日', sub: 'Jeju Sunset', hardwareColor: '#FF7F50', palette: ['#FF5E62', '#FF6B54', '#FF7947', '#FF8639', '#FF942B', '#FFA11D', '#FFAF10', '#FFBC00'], cssClass: 'modal-palette-jeju', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80' },
             'forest': { title: '首爾之森', sub: 'Seoul Forest', hardwareColor: '#8FA993', palette: ['#3B503E', '#48624C', '#55745B', '#638669', '#739779', '#84A889', '#95B99A', '#A7CAAB'], cssClass: 'modal-palette-forest', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80' },
             'hanriver': { title: '漢江夜色', sub: 'Han River Night', hardwareColor: '#3B5998', palette: ['#141E30', '#192841', '#1F3252', '#243C63', '#2A4674', '#305085', '#355A96', '#3B5998'], cssClass: 'modal-palette-hanriver', img: 'https://images.unsplash.com/photo-1704545007536-e96a57691e08?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-            'sakura': { title: '春櫻綻放', sub: 'Spring Sakura', hardwareColor: '#FFB7B2', palette: ['#FFAAA6', '#FFB1B8', '#FFB7C9', '#FFBDDA', '#FFC4EB', '#FFCAFC', '#FFC4EB', '#FFAAA6'], cssClass: 'modal-palette-sakura', img: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=800&q=80' }
-        };
+            'sakura': { title: '春櫻綻放', sub: 'Spring Sakura', hardwareColor: '#FFB7B2', palette: ['#FFAAA6', '#FFB1B8', '#FFB7C9', '#FFBDDA', '#FFC4EB', '#FFCAFC', '#FFC4EB', '#FFAAA6'], cssClass: 'modal-palette-sakura', img: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=800&q=80' },
+			'custom': { title: '專屬客製光景', sub: 'Custom Palette', hardwareColor: '#FFFFFF', palette: ['#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF'], cssClass: 'modal-palette-custom', img: '' }
+		};
 
-        // =======================
-        // 智慧分頁與面板導航
-        // =======================
+        // 觸發分頁時，強制卡片重新注入 CSS 動態類別
+        function triggerCardsAnimation(containerId) {
+            const cards = document.querySelectorAll(`${containerId} .card`);
+            cards.forEach(card => {
+                card.classList.remove('animate-card');
+                void card.offsetWidth; // 強制瀏覽器重繪
+                card.classList.add('animate-card');
+            });
+        }
+
         function switchTab(tabId) {
             vibrateLight();
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             
             document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
-            document.getElementById(`view-${tabId}`).classList.add('active');
+            const targetView = document.getElementById(`view-${tabId}`);
+            targetView.classList.add('active');
+            
+            // 強制卡片動態登場
+            triggerCardsAnimation(`#view-${tabId}`);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -642,9 +830,6 @@
             updateBrightness(val); 
         }
 
-        // =======================
-        // 擬真燈箱渲染核心
-        // =======================
         function updateLedSimulator() {
             if (animationTimer) { clearInterval(animationTimer); animationTimer = null; }
             const leds = document.querySelectorAll('.led-dot');
@@ -735,25 +920,124 @@
                 }, baseInterval / effectSpeedMulti); 
             }
         }
-
-        // =======================
-        // 控制與切換互動
-        // =======================
-        function activateScene(sceneId) {
-            document.querySelectorAll('.preset-dot').forEach(dot => dot.classList.remove('active'));
-            document.querySelectorAll('.effect-card').forEach(card => card.classList.remove('active'));
-            document.querySelectorAll('.scene-card').forEach(card => card.classList.remove('active'));
-            
-            const activeCard = document.getElementById(`scene-${sceneId}`);
-            if (activeCard) activeCard.classList.add('active');
-
-            currentMode = `scene_${sceneId}`;
-            currentHex = sceneData[sceneId].hardwareColor; 
-            document.getElementById("rgbInput").value = currentHex;
-            
-            updateLedSimulator(); saveSettings(); sendRGB();
-            showToast(`已套用藝術場景：${sceneData[sceneId].title}`);
+		
+		// ==========================================
+        // 影像色彩光譜擷取
+        // ==========================================
+        function triggerCustomUpload() {
+            vibrate();
+            document.getElementById('customImageInput').click();
         }
+
+        function handleCustomImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast("📸 正在使用邊緣運算分析相片色彩...");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgUrl = e.target.result;
+                const img = new Image();
+                img.onload = function() {
+                    // 利用隱藏 Canvas 將圖片壓縮，並橫向分為 8 等份擷取代表色
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    canvas.width = 80; canvas.height = 80;
+                    ctx.drawImage(img, 0, 0, 80, 80);
+
+                    const newPalette = [];
+                    const sliceWidth = 10; 
+                    let totalR = 0, totalG = 0, totalB = 0;
+
+                    for (let i = 0; i < 8; i++) {
+                        const imgData = ctx.getImageData(i * sliceWidth, 0, sliceWidth, 80);
+                        const data = imgData.data;
+                        let r = 0, g = 0, b = 0, count = 0;
+
+                        // 陣列解析 RGB 值
+                        for (let j = 0; j < data.length; j += 4) {
+                            if (data[j + 3] > 0) { // 忽略透明像素
+                                r += data[j]; g += data[j + 1]; b += data[j + 2];
+                                count++;
+                            }
+                        }
+                        if (count > 0) {
+                            r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
+                        }
+                        totalR += r; totalG += g; totalB += b;
+                        
+                        // 稍微提亮與增加色彩濃度，確保實體 LED 發光效果更迷人
+                        r = Math.min(255, Math.floor(r * 1.15));
+                        g = Math.min(255, Math.floor(g * 1.15));
+                        b = Math.min(255, Math.floor(b * 1.15));
+
+                        newPalette.push(rgbToHex(r, g, b));
+                    }
+
+                    // 取整張圖的平均顏色作為中心硬件底色
+                    const avgR = Math.floor(totalR / 8);
+                    const avgG = Math.floor(totalG / 8);
+                    const avgB = Math.floor(totalB / 8);
+
+                    // 1. 更新資料庫
+                    sceneData['custom'].palette = newPalette;
+                    sceneData['custom'].hardwareColor = rgbToHex(avgR, avgG, avgB);
+                    sceneData['custom'].img = imgUrl;
+
+                    // 2. 動態更新畫廊中客製化卡片的漸層預覽
+                    const gradientStr = `conic-gradient(${newPalette[0]}, ${newPalette[2]}, ${newPalette[4]}, ${newPalette[6]}, ${newPalette[0]})`;
+                    const previewEl = document.getElementById('custom-palette-preview');
+                    if (previewEl) {
+                        previewEl.style.background = gradientStr;
+                        previewEl.innerHTML = ''; // 清除中央的加號 icon
+                        previewEl.style.border = 'none';
+                    }
+
+                    // 3. 動態寫入 Modal 專用的 CSS 漸層樣式
+                    let styleTag = document.getElementById('custom-palette-style');
+                    if (!styleTag) {
+                        styleTag = document.createElement('style');
+                        styleTag.id = 'custom-palette-style';
+                        document.head.appendChild(styleTag);
+                    }
+                    styleTag.innerHTML = `.modal-palette-custom { background: ${gradientStr} !important; }`;
+
+                    // 4. 自動開啟並套用這組客製化場景
+                    openSceneModal('custom');
+                    
+                    // 5. 重置 input，讓使用者能重複選同一張相片
+                    event.target.value = '';
+                };
+                img.src = imgUrl;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function activateScene(sceneId) {
+			document.querySelectorAll('.preset-dot').forEach(dot => dot.classList.remove('active'));
+			document.querySelectorAll('.effect-card').forEach(card => card.classList.remove('active'));
+			document.querySelectorAll('.scene-card').forEach(card => card.classList.remove('active'));
+			
+			const activeCard = document.getElementById(`scene-${sceneId}`);
+			if (activeCard) activeCard.classList.add('active');
+
+			currentMode = `scene_${sceneId}`;
+			currentHex = sceneData[sceneId].hardwareColor; 
+			document.getElementById("rgbInput").value = currentHex;
+			
+			updateLedSimulator(); 
+			saveSettings(); 
+
+			// 🌟 核心修改：將陣列拼接成 PALETTE 指令傳送給 ESP32
+			if (typeof sendCmd === 'function') {
+				const paletteArray = sceneData[sceneId].palette;
+				// 把陣列裡的 hex 字串用逗號串起來，例如：PALETTE:#FF5E62,#FF6B54...
+				sendCmd("PALETTE:" + paletteArray.join(','));
+			}
+
+			showToast(`已套用藝術場景：${sceneData[sceneId].title}`);
+		}
 
         function activateEffect(effectName) {
             vibrate(); 
@@ -773,7 +1057,6 @@
         function stopEffects() {
             document.querySelectorAll('.effect-card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.scene-card').forEach(card => card.classList.remove('active'));
-            
             currentMode = 'static'; 
             updateLedSimulator(); saveSettings(); 
             sendCmd('MODE_STATIC'); sendRGB();
@@ -798,7 +1081,6 @@
             if(element) element.classList.add('active');
             document.getElementById("rgbInput").value = hex; currentHex = hex; currentMode = 'static';
             document.querySelectorAll('.effect-card').forEach(c => c.classList.remove('active'));
-            
             updateLedSimulator(); saveSettings(); sendRGB();
             const title = element ? element.getAttribute('title') : '品牌專屬色';
             showToast(`已套用：${title}`);
@@ -809,14 +1091,10 @@
             document.querySelectorAll('.scene-card').forEach(card => card.classList.remove('active'));
             currentHex = hex; currentMode = 'static';
             document.querySelectorAll('.effect-card').forEach(c => c.classList.remove('active'));
-            
             updateLedSimulator(); saveSettings(); sendRGB();
             showToast(`已套用客製色：${hex.toUpperCase()}`);
         }
 
-        // =======================
-        // 情境、定時、節能
-        // =======================
         function toggleEcoMode() {
             vibrate(); isEcoMode = !isEcoMode;
             const ecoBtn = document.getElementById("ecoBtn"); const brightInput = document.getElementById("brightnessInput");
@@ -868,9 +1146,6 @@
             showToast('燈箱已進入休眠'); vibrate();
         }
 
-        // =======================
-        // UI 狀態監聽與記憶存取
-        // =======================
         const statusEl = document.getElementById("status");
         const statusIcon = document.getElementById("statusIcon");
         const mainConnectBtn = document.getElementById("mainConnectBtn");
@@ -950,9 +1225,10 @@
             }
         }
 
-        // 開機初始化
         window.onload = function() {
             loadSettings(); 
+            // 首次開啟網頁時，為首頁注入登場動畫
+            triggerCardsAnimation('#view-home');
             updateLedSimulator();
             setTimeout(() => { showToast("歡迎使用 Bespoke 燈箱控制系統"); }, 800);
         }
