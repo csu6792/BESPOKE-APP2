@@ -469,6 +469,9 @@
     <p style="font-size: 0.65rem; color: var(--text-secondary); line-height: 1.6; margin: 0; letter-spacing: 0.05em; text-align: justify;">
         因 Apple 原生系統對網頁藍牙（Web Bluetooth）的權限限制，若您使用 iPhone，請先至 App Store 下載 <strong>「ble Link」</strong> APP，並於該 APP 內開啟本網頁，即可完美啟用智慧燈箱的藍牙同步功能。
     </p>
+	<button onclick="handleIOSRedirect()" style="width: 100%; padding: 12px; background: var(--accent-gold, #C2A782); color: white; border: none; border-radius: 10px; font-size: 0.7rem; font-weight: 400; letter-spacing: 0.15em; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(194, 167, 130, 0.2);" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        ✦ 一鍵喚醒 iOS 藍牙控制器
+    </button>	
 </div>
 
                 <hr class="story-divider">
@@ -756,6 +759,37 @@
                 showToast('連線已中斷');
             }
         }
+
+		// 🌟 iOS 智慧跳轉與自動帶入網址邏輯
+function handleIOSRedirect() {
+    vibrate();
+    
+    // 1. 取得當前網頁的絕對路徑 (不管您是 localhost、IP 還是正式網址都會自動抓取)
+    const currentURL = window.location.href;
+    
+    // 2. 去除網址前綴，轉換成 Bluefy 瀏覽器能識別的格式
+    // 例如 https://csuilab.com -> bluefy://csuilab.com
+    const cleanURL = currentURL.replace(/^https?:\/\//, '');
+    const bluefyScheme = "bluefy://" + cleanURL;
+    
+    // 3. 記錄點擊時間，用來判斷 iPhone 是否有成功跳轉
+    const startTime = Date.now();
+    
+    // 顯示備用的手動複製按鈕
+    document.getElementById('ios-fallback').style.display = 'block';
+
+    // 4. 嘗試喚醒 APP 
+    window.location.href = bluefyScheme;
+
+    // 5. 【關鍵防呆】延遲 2.5 秒，如果網頁沒有被切換(代表沒安裝APP)，就自動引導去 App Store 下載
+    setTimeout(function() {
+        if (Date.now() - startTime < 3000) {
+            showToast('正在導向 App Store 下載 Bluefy 藍牙瀏覽器...');
+            // 導向 Bluefy 的 App Store 官方下載頁面
+            window.location.href = "https://apps.apple.com/app/id1492297569";
+        }
+    }, 2500);
+}
 
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
