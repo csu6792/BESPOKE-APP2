@@ -760,59 +760,65 @@
             }
         }
 
-		// 🌟 完美修正版：解決 iOS 跨區與國家顯示錯誤的問題
+		// 🌐 GitHub Pages (HTTPS) 專屬：BLE-Link 一鍵喚醒與自動帶入網址
 function handleIOSRedirect() {
     try { 
         if (typeof vibrate === "function") vibrate(); 
     } catch(e) {}
     
     try { 
-        if (typeof showToast === "function") showToast('嘗試喚醒藍牙瀏覽器...'); 
+        if (typeof showToast === "function") showToast('正在喚醒 BLE-Link 藍牙控制器...'); 
     } catch(e) {}
 
+    // 1. 取得當前的 GitHub Pages 完整網址 (包含 https://)
     const currentURL = window.location.href;
-    const cleanURL = currentURL.replace(/^https?:\/\//, '');
-    const primaryScheme = "bluefy://" + cleanURL;
-    const backupScheme = "bluefy://" + currentURL;
+    
+    // 2. 針對 BLE-Link 的標準 URL Scheme 格式
+    // 格式為 blelink://https://xxxx.github.io/
+    const blelinkScheme = "blelink://" + currentURL;
 
+    // 3. 【黃金防呆】背景自動複製網址（萬一系統阻擋，用戶直接長按貼上）
+    try {
+        navigator.clipboard.writeText(currentURL);
+    } catch(err) {
+        const el = document.createElement('textarea');
+        el.value = currentURL;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+
+    // 4. 更新提示文字
     const fallbackEl = document.getElementById('ios-fallback');
-    if (fallbackEl) fallbackEl.style.display = 'block';
+    if (fallbackEl) {
+        fallbackEl.innerHTML = `<span onclick="copyCurrentURL()" style="font-size: 0.6rem; color: #96938D; cursor: pointer; text-decoration: underline; letter-spacing: 0.05em;">
+            💡 網址已自動複製。若 App 未成功載入，請在網址列「長按貼上」。
+        </span>`;
+        fallbackEl.style.display = 'block';
+    }
 
-    const createAndClickAnchor = (url) => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 100);
-    };
+    // 5. 模擬真人點擊，喚醒 BLE-Link 並帶入 HTTPS 網址
+    const a = document.createElement('a');
+    a.href = blelinkScheme;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 100);
 
     const startTime = Date.now();
 
-    // 1. 嘗試喚醒已下載的 Bluefy App
-    createAndClickAnchor(primaryScheme);
-
-    // 1.5 秒後，若還留在網頁，嘗試備用格式
+    // 6. 延遲 3 秒：若沒安裝，精準導向台灣區 BLE-Link 下載頁
     setTimeout(function() {
-        if (Date.now() - startTime < 2000) {
-            createAndClickAnchor(backupScheme);
-        }
-    }, 1500);
-
-    // 3.5 秒後，若確認沒有安裝，引導去下載
-    setTimeout(function() {
-        if (Date.now() - startTime < 4000) {
+        if (Date.now() - startTime < 3500) {
             try { 
-                if (typeof showToast === "function") showToast('未安裝 App，開啟台灣 App Store...'); 
+                if (typeof showToast === "function") showToast('未偵測到 App，導向 App Store...'); 
             } catch(e) {}
-            
-            // 🌟 關鍵修正：使用 itms-apps 協定 + 指定台灣區(/tw/)與 APP 名稱
-            // 這能確保 100% 直接喚醒手機內建的 App Store App，並精準定位台灣商店
-            window.location.href = "itms-apps://apps.apple.com/tw/app/bluefy-web-ble-browser/id1492297569";
+            // 使用您提供的正確 ID
+            window.location.href = "itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672";
         }
-    }, 3500);
+    }, 3000);
 }
-
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
         // =========================================================================
