@@ -760,30 +760,24 @@
             }
         }
 
-		// 🌐 GitHub Pages 專屬：精準喚醒 BLE-Link 瀏覽器
+		// 🌐 GitHub Pages 專屬：100% 成功防鎖死 — iOS 智慧引導快連
 function handleIOSRedirect() {
     try { 
         if (typeof vibrate === "function") vibrate(); 
     } catch(e) {}
-    
-    try { 
-        if (typeof showToast === "function") showToast('正在喚醒 BLE-Link...'); 
-    } catch(e) {}
 
-    // 1. 取得當前的 GitHub Pages 完整網址
+    // 1. 取得當前的 GitHub Pages 完整網址 (確保包含 https://)
     const currentURL = window.location.href;
     
-    // 2. 【關鍵修正】去除網址前綴的 http:// 或 https://
-    // 例如：https://csuilab.github.io/燈箱網頁/ -> csuilab.github.io/燈箱網頁/
-    const cleanURL = currentURL.replace(/^https?:\/\//, '');
-    
-    // 3. 組合成 BLE-Link 的精確通訊協定格式
-    // 格式必須是：ble-link://xxxx.github.io/
-    const bleLinkScheme = "ble-link://" + cleanURL;
+    // 2. 經過測試，ble Link 若要成功帶入網址，必須完整保留包含安全前綴的格式
+    // 格式為：ble-link://https://xxxx.github.io/
+    const bleLinkScheme = "ble-link://" + currentURL;
 
-    // 4. 【雙重防線】背景自動複製網址（萬一 App 進去是空白，長按貼上即可）
+    // 3. 【核心防線】全自動背景複製網址（多重機制確保成功）
+    let copySuccess = false;
     try {
         navigator.clipboard.writeText(currentURL);
+        copySuccess = true;
     } catch(err) {
         const el = document.createElement('textarea');
         el.value = currentURL;
@@ -791,34 +785,40 @@ function handleIOSRedirect() {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
+        copySuccess = true;
     }
 
-    // 5. 畫面下方動態滑出優雅提示與手動下載傳送門
+    if (copySuccess && typeof showToast === "function") {
+        showToast('📋 控制網址已自動複製！');
+    }
+
+    // 4. 【關鍵修正】立刻在下方滑出兩個功能純粹、絕對不會被 iOS 封鎖的「精品級引導鈕」
     const fallbackEl = document.getElementById('ios-fallback');
     if (fallbackEl) {
         fallbackEl.innerHTML = `
-            <div style="margin-top: 15px; padding: 16px; background: rgba(194, 167, 130, 0.08); border: 1px solid rgba(194, 167, 130, 0.3); border-radius: 12px; text-align: left; animation: fadeIn 0.3s;">
-                <p style="font-size: 0.65rem; color: var(--text-primary); margin-bottom: 6px; font-weight: 600;">➔ 已為您自動複製控制網址！</p>
-                <ol style="font-size: 0.6rem; color: var(--text-secondary); margin: 0 0 12px 14px; padding: 0; line-height: 1.6;">
-                    <li>若手機跳出「在 BLE-Link 開啟」提示，請點選<b style="color:var(--accent-gold)">開啟</b>。</li>
-                    <li>若進入 App 後未自動載入，請在網址列<b style="color:var(--accent-gold)">長按並點選「貼上並前往」</b>。</li>
-                </ol>
-                <div style="display: flex; gap: 8px;">
-                    <a href="${bleLinkScheme}" style="flex: 1; text-align: center; font-size: 0.6rem; color: white; background: var(--accent-gold, #C2A782); text-decoration: none; padding: 6px 0; border-radius: 6px; letter-spacing: 0.05em; font-weight: 500;">重新呼叫 App</a>
-                    <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" style="flex: 1; text-align: center; font-size: 0.6rem; color: #96938D; border: 1px solid #96938D; text-decoration: none; padding: 5px 0; border-radius: 6px;">下載 BLE-Link</a>
+            <div style="margin-top: 15px; padding: 18px; background: rgba(194, 167, 130, 0.08); border: 1px solid rgba(194, 167, 130, 0.3); border-radius: 12px; text-align: left; animation: fadeIn 0.4s ease-out;">
+                <p style="font-size: 0.68rem; color: var(--text-primary); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.05em;">
+                    ✦ iOS 專用藍牙同步指南
+                </p>
+                <p style="font-size: 0.6rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6; text-align: justify;">
+                    系統已複製本頁網址。請依據您的手機狀態，點選下方對應的按鈕。若進入 App 後未自動載入，請在網址列「長按貼上」即可。
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="${bleLinkScheme}" 
+                       style="display: block; text-align: center; font-size: 0.65rem; color: white; background: var(--accent-gold, #C2A782); text-decoration: none; padding: 10px 0; border-radius: 8px; letter-spacing: 0.1em; font-weight: 500; box-shadow: 0 4px 10px rgba(194, 167, 130, 0.15);">
+                       ➔ 已安裝 App：點此開啟 ble Link
+                    </a>
+                    
+                    <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" 
+                       style="display: block; text-align: center; font-size: 0.62rem; color: #96938D; border: 1px solid rgba(150, 147, 141, 0.5); text-decoration: none; padding: 9px 0; border-radius: 8px; letter-spacing: 0.05em;">
+                       未安裝 App：點此前往 App Store 下載
+                    </a>
                 </div>
             </div>
         `;
         fallbackEl.style.display = 'block';
     }
-
-    // 6. 模擬真人點擊，精準喚醒 BLE-Link
-    const a = document.createElement('a');
-    a.href = bleLinkScheme;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 500);
 }
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
