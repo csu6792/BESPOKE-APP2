@@ -760,20 +760,19 @@
             }
         }
 
-		// 🌐 GitHub Pages 專屬：100% 成功防鎖死 — iOS 智慧引導快連
+		// 🌐 GitHub Pages 專屬：純淨喚醒 BLE-Link（解決網址無效報錯）
 function handleIOSRedirect() {
     try { 
         if (typeof vibrate === "function") vibrate(); 
     } catch(e) {}
 
-    // 1. 取得當前的 GitHub Pages 完整網址 (確保包含 https://)
     const currentURL = window.location.href;
     
-    // 2. 經過測試，ble Link 若要成功帶入網址，必須完整保留包含安全前綴的格式
-    // 格式為：ble-link://https://xxxx.github.io/
-    const bleLinkScheme = "ble-link://" + currentURL;
+    // 【核心破局點】把後面的網址全部砍掉！只使用最純粹的「開門指令」
+    // 這樣 iOS 就絕對不會報錯「網址無效」
+    const pureBleLinkScheme = "blelink://"; 
 
-    // 3. 【核心防線】全自動背景複製網址（多重機制確保成功）
+    // 1. 全自動背景複製網址（多重機制確保成功）
     let copySuccess = false;
     try {
         navigator.clipboard.writeText(currentURL);
@@ -792,33 +791,43 @@ function handleIOSRedirect() {
         showToast('📋 控制網址已自動複製！');
     }
 
-    // 4. 【關鍵修正】立刻在下方滑出兩個功能純粹、絕對不會被 iOS 封鎖的「精品級引導鈕」
-    const fallbackEl = document.getElementById('ios-fallback');
-    if (fallbackEl) {
-        fallbackEl.innerHTML = `
-            <div style="margin-top: 15px; padding: 18px; background: rgba(194, 167, 130, 0.08); border: 1px solid rgba(194, 167, 130, 0.3); border-radius: 12px; text-align: left; animation: fadeIn 0.4s ease-out;">
-                <p style="font-size: 0.68rem; color: var(--text-primary); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.05em;">
-                    ✦ iOS 專用藍牙同步指南
-                </p>
-                <p style="font-size: 0.6rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6; text-align: justify;">
-                    系統已複製本頁網址。請依據您的手機狀態，點選下方對應的按鈕。若進入 App 後未自動載入，請在網址列「長按貼上」即可。
-                </p>
-                
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="${bleLinkScheme}" 
-                       style="display: block; text-align: center; font-size: 0.65rem; color: white; background: var(--accent-gold, #C2A782); text-decoration: none; padding: 10px 0; border-radius: 8px; letter-spacing: 0.1em; font-weight: 500; box-shadow: 0 4px 10px rgba(194, 167, 130, 0.15);">
-                       ➔ 已安裝 App：點此開啟 ble Link
-                    </a>
-                    
-                    <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" 
-                       style="display: block; text-align: center; font-size: 0.62rem; color: #96938D; border: 1px solid rgba(150, 147, 141, 0.5); text-decoration: none; padding: 9px 0; border-radius: 8px; letter-spacing: 0.05em;">
-                       未安裝 App：點此前往 App Store 下載
-                    </a>
-                </div>
-            </div>
-        `;
-        fallbackEl.style.display = 'block';
+    // 2. 自動建立防呆 UI 框架
+    let fallbackEl = document.getElementById('ios-fallback');
+    if (!fallbackEl) {
+        fallbackEl = document.createElement('div');
+        fallbackEl.id = 'ios-fallback';
+        const clickedButton = event ? event.target : null;
+        if (clickedButton && clickedButton.parentNode) {
+            clickedButton.parentNode.insertBefore(fallbackEl, clickedButton.nextSibling);
+        } else {
+            document.body.appendChild(fallbackEl);
+        }
     }
+
+    // 3. 渲染雙按鈕介面
+    fallbackEl.innerHTML = `
+        <div style="margin-top: 15px; padding: 18px; background: rgba(194, 167, 130, 0.1); border: 2px solid #C2A782; border-radius: 12px; text-align: left; box-sizing: border-box;">
+            <p style="font-size: 14px; color: #333333; margin: 0 0 8px 0; font-weight: 600; letter-spacing: 0.05em;">
+                ✦ iOS 專用藍牙同步指南
+            </p>
+            <p style="font-size: 12px; color: #666666; margin: 0 0 14px 0; line-height: 1.6; text-align: justify;">
+                系統已複製本頁網址。請點擊下方開啟 App，進入後在上方網址列<strong>「長按 ➔ 貼上並前往」</strong>即可連線。
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="${pureBleLinkScheme}" 
+                   style="display: block; text-align: center; font-size: 13px; color: white; background: #C2A782; text-decoration: none; padding: 12px 0; border-radius: 8px; letter-spacing: 0.1em; font-weight: 500; box-shadow: 0 4px 10px rgba(194, 167, 130, 0.3);">
+                   ➔ 已安裝 App：點此開啟 ble Link
+                </a>
+                
+                <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" 
+                   style="display: block; text-align: center; font-size: 12px; color: #666666; border: 1px solid #96938D; background: #ffffff; text-decoration: none; padding: 11px 0; border-radius: 8px; letter-spacing: 0.05em;">
+                   未安裝 App：點此前往 App Store 下載
+                </a>
+            </div>
+        </div>
+    `;
+    fallbackEl.style.display = 'block';
 }
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
