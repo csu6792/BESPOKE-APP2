@@ -760,35 +760,64 @@
             }
         }
 
-		// 🌟 iOS 智慧跳轉與自動帶入網址邏輯
+		// 🌟 升級防呆版：iOS 智慧跳轉（具備錯誤攔截與模擬真人點擊機制）
 function handleIOSRedirect() {
-    vibrate();
+    // 【防線 1】安全呼叫震動與提示，加上 try-catch 防止因函式未定義而導致程式碼卡死
+    try { 
+        if (typeof vibrate === "function") vibrate(); 
+    } catch(e) { console.log("震動未啟用"); }
     
-    // 1. 取得當前網頁的絕對路徑 (不管您是 localhost、IP 還是正式網址都會自動抓取)
+    try { 
+        if (typeof showToast === "function") showToast('嘗試喚醒藍牙瀏覽器...'); 
+    } catch(e) { console.log("Toast未啟用"); }
+
+    // 取得當前網頁絕對路徑
     const currentURL = window.location.href;
     
-    // 2. 去除網址前綴，轉換成 Bluefy 瀏覽器能識別的格式
-    // 例如 https://csuilab.com -> bluefy://csuilab.com
+    // 【防線 2】產生兩種常見的 Bluefy 協議格式，應對不同 iOS 版本的網址解析
     const cleanURL = currentURL.replace(/^https?:\/\//, '');
-    const bluefyScheme = "bluefy://" + cleanURL;
-    
-    // 3. 記錄點擊時間，用來判斷 iPhone 是否有成功跳轉
+    const primaryScheme = "bluefy://" + cleanURL;   // 格式 A (去前綴): bluefy://192.168.4.1/
+    const backupScheme = "bluefy://" + currentURL;  // 格式 B (留前綴): bluefy://http://192.168.4.1/
+
+    // 顯示手動複製的備用提示區塊
+    const fallbackEl = document.getElementById('ios-fallback');
+    if (fallbackEl) fallbackEl.style.display = 'block';
+
+    // 【防線 3】模擬原生點擊法：iOS 對於 <a> 標籤的 click() 放行權限最高，能有效繞過 JS 阻擋
+    const createAndClickAnchor = (url) => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        // 延遲移除，確保瀏覽器已接收到點擊信號
+        setTimeout(() => { if(a.parentNode) document.body.removeChild(a); }, 100);
+    };
+
+    // 紀錄點擊時的時間戳記，用來智慧偵測「手機有沒有成功跳出這個網頁」
     const startTime = Date.now();
-    
-    // 顯示備用的手動複製按鈕
-    document.getElementById('ios-fallback').style.display = 'block';
 
-    // 4. 嘗試喚醒 APP 
-    window.location.href = bluefyScheme;
+    // 觸發主要跳轉格式
+    createAndClickAnchor(primaryScheme);
 
-    // 5. 【關鍵防呆】延遲 2.5 秒，如果網頁沒有被切換(代表沒安裝APP)，就自動引導去 App Store 下載
+    // 【防線 4】多重時間差相容機制
+    // 延遲 1.5 秒：如果畫面沒有被切換（代表還留在原網頁），嘗試第二種備用網址格式
     setTimeout(function() {
-        if (Date.now() - startTime < 3000) {
-            showToast('正在導向 App Store 下載 Bluefy 藍牙瀏覽器...');
-            // 導向 Bluefy 的 App Store 官方下載頁面
+        if (Date.now() - startTime < 2000) {
+            createAndClickAnchor(backupScheme);
+        }
+    }, 1500);
+
+    // 延遲 3.5 秒：如果經過兩次嘗試，依舊留在原本網頁，代表「沒安裝 App」或「環境被死鎖」
+    setTimeout(function() {
+        if (Date.now() - startTime < 4000) {
+            try { 
+                if (typeof showToast === "function") showToast('未偵測到自動跳轉，正引導至下載頁面...'); 
+            } catch(e) {}
+            // 流暢導向 Bluefy 的 App Store 官方下載頁面
             window.location.href = "https://apps.apple.com/app/id1492297569";
         }
-    }, 2500);
+    }, 3500);
 }
 
         // =========================================================================
