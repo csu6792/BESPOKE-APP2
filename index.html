@@ -277,20 +277,51 @@
                     </button>
                 </div>
                 <div style="margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.04);">
-                    <div class="slider-label-group" style="margin-bottom: 20px;">
-                        <span class="slider-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            定時休眠
-                        </span>
-                        <span class="slider-value" id="timerStatus" style="font-size: 0.7rem; color: var(--text-secondary);">未設定</span>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-                        <button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(15)">15分</button>
-                        <button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(30)">30分</button>
-                        <button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(60)">60分</button>
-                        <button class="btn btn-outline" style="padding: 12px 0; color: var(--color-danger); border-color: transparent; background: rgba(214, 151, 146, 0.1);" onclick="setTimer(0)">取消</button>
-                    </div>
-                </div>
+					<div class="slider-label-group" style="margin-bottom: 20px;">
+						<span class="slider-label">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+							定時休眠
+						</span>
+						<span class="slider-value" id="timerStatus" style="font-size: 0.7rem; color: var(--text-secondary);">未設定</span>
+					</div>
+					<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+						<button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(15)">15分</button>
+						<button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(30)">30分</button>
+						<button class="btn btn-outline" style="padding: 12px 0;" onclick="setTimer(60)">60分</button>
+						<button class="btn btn-outline" style="padding: 12px 0; color: var(--color-danger); border-color: transparent; background: rgba(214, 151, 146, 0.1);" onclick="setTimer(0)">取消</button>
+					</div>
+				</div>
+
+				<div style="margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.04);">
+					<div class="slider-label-group" style="margin-bottom: 20px;">
+						<span class="slider-label">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+							每日定時排程
+						</span>
+						<span class="slider-value" style="font-size: 0.7rem; color: var(--text-secondary);">自動執行</span>
+					</div>
+					
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+						<label style="font-size: 0.8rem; color: #666; font-weight: 500;">自動開燈時間</label>
+						<input type="time" id="sch-on-time" style="padding: 8px 12px; border: 1px solid rgba(194,167,130,0.4); border-radius: 8px; font-family: inherit; font-size: 0.8rem; color: #333; outline: none; background: #fff;">
+					</div>
+
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+						<label style="font-size: 0.8rem; color: #666; font-weight: 500;">自動關燈時間</label>
+						<input type="time" id="sch-off-time" style="padding: 8px 12px; border: 1px solid rgba(194,167,130,0.4); border-radius: 8px; font-family: inherit; font-size: 0.8rem; color: #333; outline: none; background: #fff;">
+					</div>
+
+					<div style="display: flex; gap: 10px;">
+						<button onclick="applySchedule()" style="flex: 2; padding: 12px; background: var(--accent-gold, #C2A782); color: white; border: none; border-radius: 10px; font-size: 0.8rem; letter-spacing: 0.1em; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+							套用設定
+						</button>
+						<button onclick="clearSchedule()" style="flex: 1; padding: 12px; background: transparent; color: #999; border: 1px solid #ddd; border-radius: 10px; font-size: 0.75rem; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">
+							清除
+						</button>
+					</div>
+					<p style="font-size: 0.6rem; color: #aaa; margin-top: 14px; text-align: center; margin-bottom: 0;">* 請確保燈箱保持通電，建議定期連線自動校正時間，若斷電請同步燈箱</p>
+				</div>
+				
                 <div style="height: 1px; background: rgba(0,0,0,0.04); margin: 32px 0 28px;"></div>
                 <div class="slider-label" style="margin-bottom: 16px;">品牌色系</div>
                 <div class="color-control-wrapper">
@@ -779,76 +810,124 @@
                 showToast('連線已中斷');
             }
         }
+		
+		// 🌟 套用定時排程
+		async function applySchedule() {
+			if (!commandChar) {
+				if (typeof showToast === "function") showToast("請先連線至燈箱！");
+				return;
+			}
+
+			const onTime = document.getElementById('sch-on-time').value;   // 格式為 "09:00"
+			const offTime = document.getElementById('sch-off-time').value; // 格式為 "22:30"
+			
+			if (!onTime && !offTime) {
+				if (typeof showToast === "function") showToast("請至少設定一個時間");
+				return;
+			}
+
+			try {
+				// 發送開燈時間指令 (例如 SCH_ON:09:00)
+				if (onTime) {
+					await sendCmd(`SCH_ON:${onTime}`);
+					await new Promise(r => setTimeout(r, 300)); // 延遲 0.3 秒避免藍牙塞車
+				}
+				// 發送關燈時間指令 (例如 SCH_OFF:22:30)
+				if (offTime) {
+					await sendCmd(`SCH_OFF:${offTime}`);
+				}
+				if (typeof showToast === "function") showToast("✅ 每日排程已成功套用");
+			} catch(e) {
+				console.error(e);
+				if (typeof showToast === "function") showToast("❌ 排程設定失敗");
+			}
+		}
+
+		// 🌟 清除定時排程
+		async function clearSchedule() {
+			if (!commandChar) {
+				if (typeof showToast === "function") showToast("請先連線至燈箱！");
+				return;
+			}
+			
+			// 清空前端輸入框
+			document.getElementById('sch-on-time').value = "";
+			document.getElementById('sch-off-time').value = "";
+			
+			// 告訴 ESP32 清除排程
+			await sendCmd("SCH_CLEAR");
+			if (typeof showToast === "function") showToast("🗑️ 每日排程已清除");
+		}
 
 		// 🌐 GitHub Pages 專屬：純淨喚醒 BLE-Link（解決網址無效報錯）
-function handleIOSRedirect() {
-    try { 
-        if (typeof vibrate === "function") vibrate(); 
-    } catch(e) {}
+		function handleIOSRedirect() {
+			try { 
+				if (typeof vibrate === "function") vibrate(); 
+			} catch(e) {}
 
-    const currentURL = window.location.href;
-    
-    // 【核心破局點】把後面的網址全部砍掉！只使用最純粹的「開門指令」
-    // 這樣 iOS 就絕對不會報錯「網址無效」
-    const pureBleLinkScheme = "blelink://"; 
+			const currentURL = window.location.href;
+			
+			// 【核心破局點】把後面的網址全部砍掉！只使用最純粹的「開門指令」
+			// 這樣 iOS 就絕對不會報錯「網址無效」
+			const pureBleLinkScheme = "blelink://"; 
 
-    // 1. 全自動背景複製網址（多重機制確保成功）
-    let copySuccess = false;
-    try {
-        navigator.clipboard.writeText(currentURL);
-        copySuccess = true;
-    } catch(err) {
-        const el = document.createElement('textarea');
-        el.value = currentURL;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        copySuccess = true;
-    }
+			// 1. 全自動背景複製網址（多重機制確保成功）
+			let copySuccess = false;
+			try {
+				navigator.clipboard.writeText(currentURL);
+				copySuccess = true;
+			} catch(err) {
+				const el = document.createElement('textarea');
+				el.value = currentURL;
+				document.body.appendChild(el);
+				el.select();
+				document.execCommand('copy');
+				document.body.removeChild(el);
+				copySuccess = true;
+			}
 
-    if (copySuccess && typeof showToast === "function") {
-        showToast('📋 控制網址已自動複製！');
-    }
+			if (copySuccess && typeof showToast === "function") {
+				showToast('📋 控制網址已自動複製！');
+			}
 
-    // 2. 自動建立防呆 UI 框架
-    let fallbackEl = document.getElementById('ios-fallback');
-    if (!fallbackEl) {
-        fallbackEl = document.createElement('div');
-        fallbackEl.id = 'ios-fallback';
-        const clickedButton = event ? event.target : null;
-        if (clickedButton && clickedButton.parentNode) {
-            clickedButton.parentNode.insertBefore(fallbackEl, clickedButton.nextSibling);
-        } else {
-            document.body.appendChild(fallbackEl);
-        }
-    }
+			// 2. 自動建立防呆 UI 框架
+			let fallbackEl = document.getElementById('ios-fallback');
+			if (!fallbackEl) {
+				fallbackEl = document.createElement('div');
+				fallbackEl.id = 'ios-fallback';
+				const clickedButton = event ? event.target : null;
+				if (clickedButton && clickedButton.parentNode) {
+					clickedButton.parentNode.insertBefore(fallbackEl, clickedButton.nextSibling);
+				} else {
+					document.body.appendChild(fallbackEl);
+				}
+			}
 
-    // 3. 渲染雙按鈕介面
-    fallbackEl.innerHTML = `
-        <div style="margin-top: 15px; padding: 18px; background: rgba(194, 167, 130, 0.1); border: 2px solid #C2A782; border-radius: 12px; text-align: left; box-sizing: border-box;">
-            <p style="font-size: 14px; color: #333333; margin: 0 0 8px 0; font-weight: 600; letter-spacing: 0.05em;">
-                ✦ iOS 專用藍牙同步指南
-            </p>
-            <p style="font-size: 12px; color: #666666; margin: 0 0 14px 0; line-height: 1.6; text-align: justify;">
-                系統已複製本頁網址。請點擊下方開啟 App，進入後在上方網址列<strong>「長按 ➔ 貼上並前往」</strong>即可連線。
-            </p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="${pureBleLinkScheme}" 
-                   style="display: block; text-align: center; font-size: 13px; color: white; background: #C2A782; text-decoration: none; padding: 12px 0; border-radius: 8px; letter-spacing: 0.1em; font-weight: 500; box-shadow: 0 4px 10px rgba(194, 167, 130, 0.3);">
-                   ➔ 已安裝 App：點此開啟 ble Link
-                </a>
-                
-                <a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" 
-                   style="display: block; text-align: center; font-size: 12px; color: #666666; border: 1px solid #96938D; background: #ffffff; text-decoration: none; padding: 11px 0; border-radius: 8px; letter-spacing: 0.05em;">
-                   未安裝 App：點此前往 App Store 下載
-                </a>
-            </div>
-        </div>
-    `;
-    fallbackEl.style.display = 'block';
-}
+			// 3. 渲染雙按鈕介面
+			fallbackEl.innerHTML = `
+				<div style="margin-top: 15px; padding: 18px; background: rgba(194, 167, 130, 0.1); border: 2px solid #C2A782; border-radius: 12px; text-align: left; box-sizing: border-box;">
+					<p style="font-size: 14px; color: #333333; margin: 0 0 8px 0; font-weight: 600; letter-spacing: 0.05em;">
+						✦ iOS 專用藍牙同步指南
+					</p>
+					<p style="font-size: 12px; color: #666666; margin: 0 0 14px 0; line-height: 1.6; text-align: justify;">
+						系統已複製本頁網址。請點擊下方開啟 App，進入後在上方網址列<strong>「長按 ➔ 貼上並前往」</strong>即可連線。
+					</p>
+					
+					<div style="display: flex; flex-direction: column; gap: 10px;">
+						<a href="${pureBleLinkScheme}" 
+						   style="display: block; text-align: center; font-size: 13px; color: white; background: #C2A782; text-decoration: none; padding: 12px 0; border-radius: 8px; letter-spacing: 0.1em; font-weight: 500; box-shadow: 0 4px 10px rgba(194, 167, 130, 0.3);">
+						   ➔ 已安裝 App：點此開啟 ble Link
+						</a>
+						
+						<a href="itms-apps://apps.apple.com/tw/app/ble-link-web-ble-browser/id6468414672" 
+						   style="display: block; text-align: center; font-size: 12px; color: #666666; border: 1px solid #96938D; background: #ffffff; text-decoration: none; padding: 11px 0; border-radius: 8px; letter-spacing: 0.05em;">
+						   未安裝 App：點此前往 App Store 下載
+						</a>
+					</div>
+				</div>
+			`;
+			fallbackEl.style.display = 'block';
+		}
         // =========================================================================
         // 🌟 自癒式動態 Toast 通知機制
         // =========================================================================
