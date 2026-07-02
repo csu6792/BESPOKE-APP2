@@ -701,6 +701,10 @@
                 // 取得指令特徵值
                 commandChar = await service.getCharacteristic(COMMAND);
                 document.getElementById("status").innerText = "狀態：已就緒";
+				
+				setTimeout(() => {
+					syncTimeToESP32();
+				}, 1000);
             } catch(e) {
                 console.error(e);
                 document.getElementById("status").innerText = "錯誤";
@@ -731,6 +735,22 @@
                 console.error("BLE 指令發送失敗:", e); 
             }
         }
+		
+		// 🌟 獲取手機當前時間，並透過 BLE 發送
+		async function syncTimeToESP32() {
+			// 確保有連線才執行
+			if (!commandChar) return; 
+
+			// 取得當下的 Unix 時間戳 (將毫秒除以 1000 轉成秒)
+			const currentTime = Math.floor(Date.now() / 1000);
+			
+			// 組合成 ESP32 認得的指令格式，例如 "TIME_1719884560"
+			const timeCmd = "TIME_" + currentTime;
+			
+			// 直接呼叫您的 sendCmd 函式發送！
+			await sendCmd(timeCmd); 
+			console.log("已自動同步手機時間至燈箱：", timeCmd);
+		}
 
         async function sendRGB() {
             let colorInput = document.getElementById("rgbInput");
