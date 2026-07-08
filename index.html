@@ -1328,7 +1328,7 @@
             currentMode = effectName; 
             updateLedSimulator(); saveSettings(); sendCmd(`MODE_${effectName.toUpperCase()}`);
 
-            const effectNamesZh = { 'fire': '曜暖火焰', 'rainbow': '極光絢彩', 'flow': '水光流螢', 'breath': '靜謐呼吸', 'star': '晨星微爍', 'meteor': '香檳流星', 'prism': '晶透變奏', 'ripple': '波光漣漪' };
+            const effectNamesZh = { 'fire': '曜暖火焰', 'rainbow': '極光絢彩', 'flow': '水光流螢', 'breath': '靜謐呼吸', 'star': '晨星微爍', 'meteor': '香檳流星', 'prism': '晶透變奏', 'ripple': '波光漣漪', 'chase': '復古跑馬', 'scanner': '科技掃描', 'wipe': '優雅漸染', 'neon': '賽博霓虹' };
             showToast(`已切換至 ${effectNamesZh[effectName] || '動態'} 模式`);
         }
 
