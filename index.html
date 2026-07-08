@@ -412,6 +412,14 @@
                         <span class="effect-name">賽博霓虹</span><span class="effect-desc">隨機閃爍</span>
                     </div>
                 </div>
+				
+				<div style="padding: 0 24px; margin-bottom: 24px;">
+					<button id="sync-mic-btn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, #d69792, #c2a782);" onclick="toggleMusicSync()">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+						<span id="mic-btn-text">啟動 派對三頻律動</span>
+					</button>
+				</div>
+				
                 <div class="slider-container" style="margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.04);">
                     <div class="slider-label-group">
                         <span class="slider-label">
@@ -1294,6 +1302,113 @@
 
 			showToast(`已套用藝術場景：${sceneData[sceneId].title}`);
 		}
+		
+		
+		
+		// 🌟 派對三頻律動專屬變數
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let isMusicSyncing = false;
+        let lastBleTime = 0; // 用於藍牙發送節流防爆
+
+        async function toggleMusicSync() {
+		
+			if (bleDevice && bleDevice.gatt.connected) {
+                if (currentDeviceVersion < 4.0) {
+                    openUpdateModal();
+                    return; // 🛑 直接中斷函式，不執行後續切換動作
+                }
+            }
+			
+            const btn = document.getElementById('sync-mic-btn');
+            const btnText = document.getElementById('mic-btn-text');
+            
+            if (isMusicSyncing) {
+                // 關閉律動模式
+                isMusicSyncing = false;
+                btnText.innerText = "啟動 派對三頻律動";
+                btn.style.background = "linear-gradient(135deg, #d69792, #c2a782)";
+                if (audioContext) {
+                    audioContext.close();
+                }
+                sendBLECommand("MODE_STATIC"); // 讓燈箱恢復靜態
+                return;
+            }
+
+            try {
+                // 1. 向手機/電腦請求麥克風權限 (只收音不開視訊)
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                isMusicSyncing = true;
+                btnText.innerText = "🎵 派對同步中... 點擊關閉";
+                btn.style.background = "#d69792"; // 變色提示正在啟動
+                vibrate();
+
+                // 2. 建立 Web Audio 上下文與分析器
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                
+                analyser.fftSize = 128; // 採樣數 128，會產生 64 個頻段網格
+                microphone.connect(analyser);
+
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                // 3. 核心音訊即時分析循環
+                function analyze() {
+                    if (!isMusicSyncing) return;
+                    requestAnimationFrame(analyze);
+
+                    // 抓取當前音訊的頻率數據
+                    analyser.getByteFrequencyData(dataArray);
+
+                    // 4. 定義三頻範圍並計算能量 (0 ~ 255)
+                    let bass = 0;   // 低音重低音 (陣列前段 0~4 格，約 20Hz - 170Hz)
+                    let mid = 0;    // 中音/人聲/主樂器 (中間段 5~20 格，約 170Hz - 1200Hz)
+                    let treble = 0; // 高音/細節 (後段 21~45 格，約 1200Hz - 5000Hz)
+
+                    for (let i = 0; i < 5; i++) bass += dataArray[i];
+                    bass = Math.floor(bass / 5);
+
+                    for (let i = 5; i < 21; i++) mid += dataArray[i];
+                    mid = Math.floor(mid / 16);
+
+                    for (let i = 21; i < 46; i++) treble += dataArray[i];
+                    treble = Math.floor(treble / 25);
+
+                    // 5. 藍牙節流防禦機制：每 65 毫秒最多只送一次資料，防頻寬爆炸
+                    let now = Date.now();
+                    if (now - lastBleTime > 65) {
+                        // 濾除環境背景微弱噪音門檻
+                        if (bass < 40) bass = 0;
+                        if (mid < 40) mid = 0;
+                        if (treble < 40) treble = 0;
+
+                        // 將低、中、高音能量分配給 RGB 做色彩映射，稍微放大高低音效果更刺激
+                        let r = Math.min(255, Math.floor(bass * 1.3));
+                        let g = Math.min(255, Math.floor(mid * 0.9));
+                        let b = Math.min(255, Math.floor(treble * 1.4));
+
+                        // 如果完全沒聲音，就送出 0,0,0 讓它熄滅或微弱
+                        sendBLECommand(`VIBE:${r},${g},${b}`);
+                        lastBleTime = now;
+                    }
+                }
+
+                analyze();
+
+            } catch (err) {
+                console.error(err);
+                alert("無法取得麥克風收音權限，請檢查瀏覽器設定！");
+                isMusicSyncing = false;
+                btnText.innerText = "啟動 派對三頻律動";
+                btn.style.background = "linear-gradient(135deg, #d69792, #c2a782)";
+            }
+        }
+		
+		
+		
 		
 		const requireV2Effects = ['chase', 'scanner', 'wipe', 'neon']; //版本檢測
 
