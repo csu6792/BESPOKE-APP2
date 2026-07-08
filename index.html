@@ -196,6 +196,21 @@
             margin: 36px 0;
             border: none;
         }
+		
+		/* 🌟 專屬版本更新警告彈窗 (置中型) */
+        .alert-modal-content {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+            background: #FAF9F5; border-radius: 28px; padding: 32px 24px; box-sizing: border-box;
+            width: 85%; max-width: 320px; box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+            opacity: 0; transition: var(--transition-smooth); pointer-events: none; text-align: center;
+        }
+        .modal-overlay.show .alert-modal-content {
+            transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto;
+        }
+        .icon-danger-circle {
+            width: 64px; height: 64px; border-radius: 50%; background: rgba(214, 151, 146, 0.15); 
+            color: var(--color-danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+        }
     </style>
 </head>
 <body>
@@ -379,6 +394,22 @@
                     <div class="effect-card" id="effect-ripple" onclick="activateEffect('ripple')">
                         <span class="effect-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
                         <span class="effect-name">波光漣漪</span><span class="effect-desc">同心擴散</span>
+                    </div>
+					<div class="effect-card" id="effect-chase" onclick="activateEffect('chase')">
+                        <span class="effect-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg></span>
+                        <span class="effect-name">復古跑馬</span><span class="effect-desc">動感跳躍</span>
+                    </div>
+                    <div class="effect-card" id="effect-scanner" onclick="activateEffect('scanner')">
+                        <span class="effect-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><circle cx="12" cy="12" r="3"/></svg></span>
+                        <span class="effect-name">科技掃描</span><span class="effect-desc">來回巡航</span>
+                    </div>
+                    <div class="effect-card" id="effect-wipe" onclick="activateEffect('wipe')">
+                        <span class="effect-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+                        <span class="effect-name">優雅漸染</span><span class="effect-desc">平滑覆蓋</span>
+                    </div>
+                    <div class="effect-card" id="effect-neon" onclick="activateEffect('neon')">
+                        <span class="effect-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                        <span class="effect-name">賽博霓虹</span><span class="effect-desc">隨機閃爍</span>
                     </div>
                 </div>
                 <div class="slider-container" style="margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.04);">
@@ -669,6 +700,22 @@
             </button>
         </div>
     </div>
+	
+	
+	<div class="modal-overlay" id="updateModal" onclick="closeUpdateModal(event)">
+        <div class="alert-modal-content" id="updateModalContent">
+            <div class="icon-danger-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 style="margin: 0 0 8px; font-size: 1.1rem; color: var(--text-primary); letter-spacing: 0.1em;">韌體版本過舊</h3>
+            <p style="margin: 0 0 24px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; letter-spacing: 0.05em;">
+                此特效需要 <strong>最新版本</strong> 以上之韌體支援。<br>您的設備版本為 <span id="currentVersionDisplay" style="color: var(--color-danger); font-weight: 500;">V1.0</span>。<br>請重新燒錄最新版韌體以解鎖新功能。
+            </p>
+            <button class="btn btn-primary" style="width: 100%; font-weight: 400;" onclick="closeUpdateModal(true)">
+                我知道了
+            </button>
+        </div>
+    </div>
 
     <!-- 網頁應用核心邏輯 -->
     <script>
@@ -701,6 +748,8 @@
         let bleServer = null;
         let commandChar = null;
         let dataChar = null;
+		
+		let currentDeviceVersion = 1.0; // 預設為 1.0
 
         async function connect() {
             try {
@@ -724,9 +773,17 @@
                 // 讀取設備資訊
                 let infoChar = await service.getCharacteristic(INFO);
                 let infoValue = await infoChar.readValue();
+                let decodedInfo = new TextDecoder().decode(infoValue);
                 let infoEl = document.getElementById("info");
                 if (infoEl) {
-                    infoEl.innerText = new TextDecoder().decode(infoValue);
+                    infoEl.innerText = decodedInfo;
+                }
+				
+				let match = decodedInfo.match(/(\d+\.\d+)/);
+                if (match) {
+                    currentDeviceVersion = parseFloat(match[1]);
+                } else {
+                    currentDeviceVersion = 1.0; // 若沒解析到數字，預設為 1.0
                 }
 
                 // 取得指令特徵值
@@ -1237,8 +1294,30 @@
 
 			showToast(`已套用藝術場景：${sceneData[sceneId].title}`);
 		}
+		
+		const requireV2Effects = ['chase', 'scanner', 'wipe', 'neon']; //版本檢測
+
+        function openUpdateModal() {
+            vibrate();
+            document.getElementById('currentVersionDisplay').innerText = "V" + currentDeviceVersion.toFixed(1);
+            document.getElementById('updateModal').classList.add('show');
+        }
+
+        function closeUpdateModal(force = false) {
+            if (force === true || event.target.id === 'updateModal') {
+                vibrateLight(); document.getElementById('updateModal').classList.remove('show');
+            }
+        }
 
         function activateEffect(effectName) {
+		
+			if (bleDevice && bleDevice.gatt.connected) {
+                if (requireV2Effects.includes(effectName) && currentDeviceVersion < 3.0) {
+                    openUpdateModal();
+                    return; // 🛑 直接中斷函式，不執行後續切換動作
+                }
+            }
+		
             vibrate(); 
             document.querySelectorAll('.effect-card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.scene-card').forEach(card => card.classList.remove('active'));
