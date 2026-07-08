@@ -818,8 +818,34 @@
             dataChar = null; 
             bleServer = null;
         }
+		
+		let isBleWriting = false; // 🌟 新增：用來鎖定藍牙通道，防止連續高頻寫入導致崩潰
+		
+		async function sendCmd(cmdStr) {
+			if (!commandChar) { 
+				console.warn("未連線實體燈箱，略過實體 BLE 指令發送:", cmdStr); 
+				return; 
+			}
 
-        async function sendCmd(cmdStr) {
+			// 🌟 核心防爆機制：如果藍牙正在寫入上一次的數據，就直接丟棄這一次，避免塞爆底層
+			if (isBleWriting) {
+				return; 
+			}
+
+			try {
+				isBleWriting = true; // 鎖定通道
+
+				// 執行你原本的發送邏輯
+				await commandChar.writeValue(new TextEncoder().encode(cmdStr));
+				console.log("BLE 指令發送成功:", cmdStr);
+			} catch(e) { 
+				console.error("BLE 指令發送失敗:", e); 
+			} finally {
+				isBleWriting = false; // 🌟 傳送完畢（不論成功或失敗）務必解鎖，讓下一個節奏能進來
+			}
+		}
+
+        /*async function sendCmd(cmdStr) {
             if (!commandChar) { 
                 console.warn("未連線實體燈箱，略過實體 BLE 指令發送"); 
                 return; 
@@ -830,7 +856,7 @@
             } catch(e) { 
                 console.error("BLE 指令發送失敗:", e); 
             }
-        }
+        }*/
 		
 		// 🌟 獲取手機當前時間，並透過 BLE 發送
 		async function syncTimeToESP32() {
@@ -1332,7 +1358,7 @@
                 if (audioContext) {
                     audioContext.close();
                 }
-                sendBLECommand("MODE_STATIC"); // 讓燈箱恢復靜態
+                sendCmd("MODE_STATIC"); // 讓燈箱恢復靜態
                 return;
             }
 
@@ -1391,7 +1417,7 @@
                         let b = Math.min(255, Math.floor(treble * 1.4));
 
                         // 如果完全沒聲音，就送出 0,0,0 讓它熄滅或微弱
-                        sendBLECommand(`VIBE:${r},${g},${b}`);
+                        sendCmd(`VIBE:${r},${g},${b}`);
                         lastBleTime = now;
                     }
                 }
